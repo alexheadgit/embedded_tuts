@@ -1,6 +1,7 @@
 #include <Arduino.h>
+#include <avr/wdt.h>
 
-enum State {
+/*enum State {
   LED_ON, 
   LED_OFF
 };
@@ -16,9 +17,11 @@ boolean timeDiff(unsigned long start, int specifiedDelay){
 void setup() {
   current = LED_OFF; 
   pinMode(LED_PIN, OUTPUT);
+  wdt_enable(WDTO_15MS);
 }
 
 void loop() {
+  wdt_reset();
   State old = current; 
   switch(current){
     case LED_OFF:
@@ -35,5 +38,46 @@ void loop() {
   }
   if (old != current)
     lastChangeTime = millis();
+  delay(100);
+}*/
+const int LED_PIN=8;
+static int count = 0;
+
+void setup(){
+  pinMode(LED_PIN, OUTPUT);
+  noInterrupts();
+  TCCR1A = 0;
+  TCCR1B = 0;
+  TCNT1 = 0;
+
+  TCCR1B |= (1 << CS10);
+  TCCR1B |= (1 << CS12);
+
+  TCCR1B |= (1 << WGM12);
+
+  TIMSK1 |= (1 << OCIE1A);
+
+  TIMSK1 |= (1 << OCIE1A);
+
+  OCR1A = 15624; 
+
+  interrupts();
+}
+
+void loop(){
+ 
+}
+
+ISR(TIMER1_COMPA_vect){
+  unsigned int ledOld = digitalRead(LED_PIN);
+  if(count == 0 || count == 1){
+    digitalWrite(LED_PIN, ledOld ^ 1);
+  }
+  else if(count == 3){
+    count = 0;
+  }
+
+  count++;
+
 }
 
