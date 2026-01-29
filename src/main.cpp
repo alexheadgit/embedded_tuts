@@ -59,7 +59,7 @@ void setup(){
 
   TIMSK1 |= (1 << OCIE1A);
 
-  OCR1A = 15624; 
+  OCR1A = 3906; 
 
   interrupts();
 }
@@ -68,16 +68,19 @@ void loop(){
  
 }
 
-ISR(TIMER1_COMPA_vect){
+ISR(TIMER1_COMPA_vect) {
   unsigned int ledOld = digitalRead(LED_PIN);
-  if(count == 0 || count == 1){
-    digitalWrite(LED_PIN, ledOld ^ 1);
+  if (count == 0) {
+    digitalWrite(LED_PIN, ledOld ^ 1);   
   }
-  else if(count == 3){
-    count = 0;
+  else if (count == 1) {
+    digitalWrite(LED_PIN, ledOld ^ 1);   
   }
 
   count++;
 
+  if (count >= 4) {  
+    count = 0;
+  }
 }
 
