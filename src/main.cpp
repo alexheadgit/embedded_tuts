@@ -1,18 +1,39 @@
 #include <Arduino.h>
 
-// put function declarations here:
-int myFunction(int, int);
+enum State {
+  LED_ON, 
+  LED_OFF
+};
+State current; 
+const int LED_PIN = 8;
+const int LED_DELAY = 1000;
+unsigned long int lastChangeTime; 
+
+boolean timeDiff(unsigned long start, int specifiedDelay){
+  return (millis()-start >= specifiedDelay);
+}
 
 void setup() {
-  // put your setup code here, to run once:
-  int result = myFunction(2, 3);
+  current = LED_OFF; 
+  pinMode(LED_PIN, OUTPUT);
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  State old = current; 
+  switch(current){
+    case LED_OFF:
+      digitalWrite(LED_PIN, LOW);
+      if (timeDiff(lastChangeTime, LED_DELAY))
+        current = LED_ON;
+    break;
+
+    case LED_ON:
+      digitalWrite(LED_PIN, HIGH);
+      if (timeDiff(lastChangeTime, LED_DELAY))
+        current = LED_OFF;
+    break;
+  }
+  if (old != current)
+    lastChangeTime = millis();
 }
 
-// put function definitions here:
-int myFunction(int x, int y) {
-  return x + y;
-}
