@@ -1,12 +1,13 @@
 #include <Arduino.h>
-#include <avr/wdt.h>
+#include <esp_task_wdt.h>
 
-/*enum State {
+
+enum State {
   LED_ON, 
   LED_OFF
 };
 State current; 
-const int LED_PIN = 8;
+const int LED_PIN = 14;
 const int LED_DELAY = 1000;
 unsigned long int lastChangeTime; 
 
@@ -17,11 +18,9 @@ boolean timeDiff(unsigned long start, int specifiedDelay){
 void setup() {
   current = LED_OFF; 
   pinMode(LED_PIN, OUTPUT);
-  wdt_enable(WDTO_15MS);
 }
 
 void loop() {
-  wdt_reset();
   State old = current; 
   switch(current){
     case LED_OFF:
@@ -39,8 +38,8 @@ void loop() {
   if (old != current)
     lastChangeTime = millis();
   delay(100);
-}*/
-const int LED_PIN=8;
+}
+/*const int LED_PIN=14;
 static int count = 0;
 
 void setup(){
@@ -77,10 +76,10 @@ ISR(TIMER1_COMPA_vect) {
     digitalWrite(LED_PIN, ledOld ^ 1);   
   }
 
-  count++;
+  count--;
 
   if (count >= 9) {  
     count = 0;
   }
-}
+}*/
 
