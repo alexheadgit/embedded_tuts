@@ -2,7 +2,7 @@
 #include <esp_task_wdt.h>
 
 
-enum State {
+/*enum State {
   LED_ON, 
   LED_OFF
 };
@@ -81,5 +81,94 @@ ISR(TIMER1_COMPA_vect) {
   if (count >= 9) {  
     count = 0;
   }
+}
+
+const int DELAY = 1000;
+const int LED_PIN = 4;
+const int SWITCH_PIN = 2;
+unsigned long int lastChangeTime; 
+
+enum State {
+  LED_ON, 
+  LED_OFF
+};
+
+State current;
+
+boolean timeDiff(unsigned long start, int specifiedDelay){
+  return (millis()-start >= specifiedDelay);
+}
+
+int getLEDDelay(){
+  int delay = DELAY;
+  if (digitalRead(SWITCH_PIN) == HIGH)
+    delay /= 2;
+  return delay;
+}
+
+void ledOff(){
+  digitalWrite(LED_PIN, LOW);
+  int delay = getLEDDelay();
+
+  if (timeDiff(lastChangeTime, delay))
+    current = LED_ON;
+}
+
+void ledOn(){
+  digitalWrite(LED_PIN, HIGH);
+  int delay = getLEDDelay();
+
+  if (timeDiff(lastChangeTime, delay))
+    current = LED_OFF;
+}
+
+void setup(){
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(SWITCH_PIN, INPUT);
+  current = LED_OFF; 
+  lastChangeTime = 0;
+}
+
+void loop(){
+  State old = current; 
+  switch (current){
+    case LED_OFF: 
+      ledOff();
+      break;
+    
+      case LED_ON:
+        ledOn();
+        break;
+  }
+
+  if (old!=current){
+    lastChangeTime = millis();
+  }
 }*/
+
+const int LED_PIN = 16;
+const int SWITCH_PIN = 2;
+
+void setup() {
+  pinMode(LED_PIN, OUTPUT);
+  pinMode(SWITCH_PIN, INPUT);
+
+  Serial.begin(115200);   // ← HERE
+}
+
+void loop() {
+  int buttonState = digitalRead(SWITCH_PIN);
+  Serial.println(buttonState);
+  digitalWrite(LED_PIN, HIGH);
+
+  if (buttonState == 0) {
+    digitalWrite(LED_PIN, HIGH);
+  } else {
+    digitalWrite(LED_PIN, LOW);
+  }
+
+  delay(200); // slow down printing
+}
+
+
 
