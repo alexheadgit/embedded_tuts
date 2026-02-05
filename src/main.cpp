@@ -238,7 +238,7 @@ void loop(){
   }
   
   lastButtonState = reading;
-}*/
+}
 
 #include "Debouncer.h"
 
@@ -316,6 +316,61 @@ void loop(){
     }
   }
     
+}*/
+
+const int MIN_ADC = 0;
+const int MAX_ADC = 4095;
+const int MAX_DELAY_MS = 1500;
+const int MIN_DELAY_MS = 200;
+
+const int LED_PIN = 2;
+const int RES_PIN = 34;
+
+enum class LEDState{
+  ON, 
+  OFF
+};
+
+void setup(){
+  Serial.begin(115200);
+  pinMode(LED_PIN, OUTPUT);
+}
+
+boolean timeDiff(unsigned long start, int specifiedDelay){
+  return (millis()-start >= specifiedDelay);
+}
+
+unsigned long lastChangeTime; 
+LEDState ledCheckUpdate(LEDState state, int delayValue){
+  LEDState old = state; 
+  if(timeDiff(lastChangeTime, delayValue)){
+    if(state == LEDState::ON){
+      state = LEDState::OFF;
+    }else{ 
+      state = LEDState::ON;
+    }
+  }
+
+  if(state == LEDState::ON){
+    digitalWrite(LED_PIN, HIGH);
+  }else{
+    digitalWrite(LED_PIN, LOW);
+  }
+
+  if(old != state){
+    lastChangeTime = millis();
+  }
+  return state; 
+}
+
+LEDState current;
+
+void loop(){
+  int aRead = analogRead(RES_PIN);
+  int delayValue = map(aRead, MIN_ADC, MAX_ADC, MIN_DELAY_MS, MAX_DELAY_MS);
+
+  current = ledCheckUpdate(current, delayValue);
+  Serial.println(aRead);
 }
 
 
